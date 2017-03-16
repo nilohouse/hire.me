@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  nginx:
+    container_name: hireme_nginx
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    volumes_from:
+      - tomcat
+
+  tomcat:
+    container_name: hireme_tomcat
+    build:
+      context: ./tomcat
+    ports:
+      - "8080:8080"
+    command: /opt/tomcat/bin/catalina.sh run
+    tty: true
+
+  mysql:
+    container_name: hireme_mysql
+    build: ./mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: homestead
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root

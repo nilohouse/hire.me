@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="br.com.bemobi" level="DEBUG"/>
+    <logger name="org.apache.cxf" level="INFO"/>
+
+	<appender name="file" class="ch.qos.logback.core.FileAppender">
+      <file>logs/hireme-billing.log</file>
+      <append>true</append>
+      <encoder>
+         <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+   </appender>
+
+	<root level="INFO">
+	    <appender-ref ref="file" />
+	</root>
+</configuration>
