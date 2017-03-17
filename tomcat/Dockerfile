@@ -1,5 +1,5 @@
 FROM davidcaste/alpine-tomcat:tomcat8
-MAINTAINER Nilo Júnior (aka nilohouse) <nilojunior@estudiotouch.com>
+MAINTAINER Nilo Júnior (aka nilohouse) <nilo.jr@gmail.com>
 
 ADD server.xml /opt/tomcat/conf/server.xml
 

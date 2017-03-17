@@ -1,6 +1,6 @@
 FROM mysql:latest
 
-MAINTAINER Nilo Júnior (aka nilohouse) <nilojunior@estudiotouch.com>
+MAINTAINER Nilo Júnior (aka nilohouse) <nilo.jr@gmail.com>
 
 CMD ["mysqld"]
 
