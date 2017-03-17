@@ -1,8 +1,10 @@
 package br.com.bemobi.service;
 
-import org.springframework.stereotype.Component;
+import java.net.URL;
 
-@Component
-public class WallE {
+import br.com.bemobi.web.WallEReport;
 
+public interface WallE {
+
+	WallEReport handle(URL url, String customValue);
 }

@@ -2,7 +2,7 @@ package br.com.bemobi.web;
 
 import java.util.Map;
 
-public class ApiResponse {
+public class WallEReport {
 	private String alias;
 	private String url;
 	private String errCode;
