@@ -5,6 +5,8 @@ import java.net.URL;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,8 @@ import br.com.bemobi.service.WallE;
 
 @RestController
 public class ApiController {
+	
+	private static final Logger log = LoggerFactory.getLogger(ApiController.class);
 
 	@Autowired
 	private WallE wallE;
@@ -30,12 +34,14 @@ public class ApiController {
 
 	@RequestMapping(value = "/retrieve/{alias}", method = RequestMethod.GET)
 	public void retrieve(HttpServletResponse response,
-			@PathVariable("alias") String alias) throws IOException {
+			@PathVariable String alias) throws IOException {
 		final ShortenedURL shortenedURL = wallE.findUrl(alias);
 		
 		if (shortenedURL != null && shortenedURL.getUrl() != null) {
+			log.info("Redirecting alias {} to URL {}", alias, shortenedURL.getUrl().toString());
 			response.sendRedirect(shortenedURL.getUrl().toString());
 		} else {
+			log.warn("Alias not found: {}", alias);
 			response.sendError(HttpServletResponse.SC_NO_CONTENT,
 					"No URL to forward for alias "+alias);
 		}
