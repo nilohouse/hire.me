@@ -2,6 +2,10 @@ package br.com.bemobi.web;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class WallEReport {
 	private String alias;
 	private String url;
