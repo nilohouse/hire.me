@@ -1,6 +1,7 @@
 package br.com.bemobi.web;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -21,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import br.com.bemobi.domain.ShortenedURL;
+import br.com.bemobi.domain.helper.ShortenedURLBuilder;
 import br.com.bemobi.service.WallE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +43,7 @@ public class ApiControllerTest {
 
 	@Test
 	public void shouldntAllowInvalidUrl() throws Exception {
-		this.mvc.perform(put("/create?url=homerlovesdonut")
+		this.mvc.perform(put("/create?url=homerlovesdonuts")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
@@ -49,7 +52,7 @@ public class ApiControllerTest {
 	
 	@Test
 	public void shouldAllowValidUrl() throws Exception {
-		this.mvc.perform(put("/create?url=http://homerlovesdonut.org")
+		this.mvc.perform(put("/create?url=http://homerlovesdonuts.org")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
@@ -76,5 +79,30 @@ public class ApiControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.alias", is(expectedAlias)));
+	}
+	
+	@Test
+	public void noContentForUnknownAlias() throws Exception {
+		this.mvc.perform(get("/retrieve/idontknowyou")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON))
+		.andDo(print())
+		.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	public void shouldRedirectExistingAlias() throws Exception {
+		String knownAlias = "majorThom";
+		ShortenedURL urlToForward = ShortenedURLBuilder.newBuilder()
+									.url(new URL("http://spaceoddity.com"))
+									.build();
+		
+		Mockito.when(wallE.findUrl(Mockito.anyString())).thenReturn(urlToForward);
+		
+		this.mvc.perform(get("/retrieve/"+knownAlias)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON))
+		.andDo(print())
+		.andExpect(status().is3xxRedirection());
 	}
 }
