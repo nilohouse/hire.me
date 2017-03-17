@@ -1,7 +1,6 @@
 package br.com.bemobi.domain;
 
 import java.io.Serializable;
-import java.net.URL;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,8 +17,11 @@ public class ShortenedURL implements Serializable {
 	private Long id;
 	
 	@Column(nullable=false)
-	private URL url;
-
+	private String url;
+	
+	@Column(nullable=false, unique=true)
+	private String alias;
+	
 	public Long getId() {
 		return id;
 	}
@@ -28,11 +30,19 @@ public class ShortenedURL implements Serializable {
 		this.id = id;
 	}
 
-	public URL getUrl() {
+	public String getUrl() {
 		return url;
 	}
-
-	public void setUrl(URL url) {
+	
+	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	public String getAlias() {
+		return alias;
+	}
+	
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 }

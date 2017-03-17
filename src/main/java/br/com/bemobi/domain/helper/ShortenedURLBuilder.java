@@ -1,13 +1,20 @@
 package br.com.bemobi.domain.helper;
 
+import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.bemobi.domain.ShortenedURL;
 
 public final class ShortenedURLBuilder {
 
+	private static final Logger log = LoggerFactory.getLogger(ShortenedURLBuilder.class);
+	
 	private Long id;
 	private URL url;
+	private String alias;
 
 	private ShortenedURLBuilder() {
 		//
@@ -27,10 +34,25 @@ public final class ShortenedURLBuilder {
 		return this;
 	}
 	
+	public ShortenedURLBuilder url(String url) {
+		try {
+			this.url = new URL(url);
+		} catch (MalformedURLException e) {
+			log.warn("Invalid url: {}", url);
+		}
+		return this;
+	}
+	
+	public ShortenedURLBuilder alias(String alias) {
+		this.alias = alias;
+		return this;
+	}
+	
 	public ShortenedURL build() {
 		ShortenedURL shortenedURL = new ShortenedURL();
 		shortenedURL.setId(id);
-		shortenedURL.setUrl(url);
+		shortenedURL.setUrl(url.toString());
+		shortenedURL.setAlias(alias);
 		
 		return shortenedURL;
 	}
