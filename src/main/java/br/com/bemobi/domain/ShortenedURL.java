@@ -45,4 +45,8 @@ public class ShortenedURL implements Serializable {
 	public void setAlias(String alias) {
 		this.alias = alias;
 	}
+
+	public static boolean isValid(ShortenedURL shortenedURL) {
+		return shortenedURL != null && shortenedURL.getUrl() != null;
+	}
 }

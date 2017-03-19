@@ -1,9 +1,14 @@
 package br.com.bemobi.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -14,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import br.com.bemobi.domain.AccessLogRepository;
 import br.com.bemobi.domain.ShortenedURL;
 import br.com.bemobi.domain.ShortenedURLRepository;
 import br.com.bemobi.web.WallEReport;
@@ -30,11 +36,14 @@ public class WallEIntegrationTest {
 	@Autowired
 	private ShortenedURLRepository repository;
 	
+	@Autowired
+	private AccessLogRepository accessLogRepository;
+	
 	private WallE wallE;
 	
 	@Before
 	public void setUp() {
-		this.wallE = new WallEImpl(repository, Hashing.murmur3_32());
+		this.wallE = new WallEImpl(repository, accessLogRepository ,Hashing.murmur3_32());
 	}
 	
 	@After
@@ -119,5 +128,18 @@ public class WallEIntegrationTest {
 		assertTrue(shortenedUrl.getId() > 0);
 		assertEquals(shortenedUrl.getUrl(), urlPath);
 		assertEquals(shortenedUrl.getAlias(), customAlias);
+	}
+	
+	@Test
+	public void createRetrieveAndCheckAccessLogTest() throws MalformedURLException {
+		String urlPath = "http://hammer.time";
+		String customAlias = "sayHelloToMyLittleFriend";
+		URL url = new URL(urlPath);
+		WallEReport result = wallE.handle(url, customAlias);
+		wallE.findUrl(result.getAlias());
+		
+		final List<Map<String, Object>> accessLogSummary = accessLogRepository.getCompleteAccessLogSummary();
+		assertNotNull(accessLogSummary);
+		assertEquals(1, Long.valueOf(accessLogSummary.get(0).get("hits").toString()).longValue());
 	}
 }

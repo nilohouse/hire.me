@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
+import br.com.bemobi.domain.AccessLog;
 import br.com.bemobi.domain.ShortenedURL;
 import br.com.bemobi.domain.ShortenedURLRepository;
+import br.com.bemobi.domain.AccessLogRepository;
 import br.com.bemobi.domain.helper.ShortenedURLBuilder;
 import br.com.bemobi.service.helper.WallEReportBuilder;
 import br.com.bemobi.web.WallEReport;
@@ -23,12 +25,16 @@ import com.google.common.hash.HashFunction;
 public class WallEImpl implements WallE {
 
 	private ShortenedURLRepository repository;
+	
+	private AccessLogRepository accessLogRepository;
 
 	private HashFunction hash;
 
 	public WallEImpl(@Autowired ShortenedURLRepository repository,
+			@Autowired AccessLogRepository accessLogRepository,
 			@Autowired HashFunction hash) {
 		this.repository = repository;
+		this.accessLogRepository = accessLogRepository;
 		this.hash = hash;
 	}
 
@@ -77,6 +83,19 @@ public class WallEImpl implements WallE {
 
 	@Override
 	public ShortenedURL findUrl(String alias) {
-		return repository.findByAlias(alias);
+		final ShortenedURL shortenedURL = repository.findByAlias(alias);
+		
+		if (ShortenedURL.isValid(shortenedURL)) {
+			checkIn(shortenedURL);
+		}
+		
+		return shortenedURL;
+	}
+
+	private void checkIn(ShortenedURL shortenedURL) {
+		AccessLog accessLog = new AccessLog();
+		accessLog.setUrl(shortenedURL.getUrl());
+		accessLog.setShortenedUrlId(shortenedURL.getId());
+		accessLogRepository.save(accessLog);
 	}
 }

@@ -38,7 +38,7 @@ public class ApiController {
 			@PathVariable String alias) throws IOException {
 		final ShortenedURL shortenedURL = wallE.findUrl(alias);
 		
-		if (shortenedURL != null && shortenedURL.getUrl() != null) {
+		if (ShortenedURL.isValid(shortenedURL)) {
 			log.info("Redirecting alias {} to URL {}", alias, shortenedURL.getUrl().toString());
 			response.sendRedirect(shortenedURL.getUrl().toString());
 			return WallEReportBuilder.emptyReport();
