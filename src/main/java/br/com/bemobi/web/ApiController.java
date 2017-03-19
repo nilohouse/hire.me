@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.bemobi.domain.ShortenedURL;
 import br.com.bemobi.service.WallE;
+import br.com.bemobi.service.helper.WallEReportBuilder;
 
 @RestController
 public class ApiController {
@@ -33,17 +34,20 @@ public class ApiController {
 	}
 
 	@RequestMapping(value = "/retrieve/{alias}", method = RequestMethod.GET)
-	public void retrieve(HttpServletResponse response,
+	public WallEReport retrieve(HttpServletResponse response,
 			@PathVariable String alias) throws IOException {
 		final ShortenedURL shortenedURL = wallE.findUrl(alias);
 		
 		if (shortenedURL != null && shortenedURL.getUrl() != null) {
 			log.info("Redirecting alias {} to URL {}", alias, shortenedURL.getUrl().toString());
 			response.sendRedirect(shortenedURL.getUrl().toString());
+			return WallEReportBuilder.emptyReport();
 		} else {
 			log.warn("Alias not found: {}", alias);
-			response.sendError(HttpServletResponse.SC_NO_CONTENT,
-					"No URL to forward for alias "+alias);
+			return WallEReportBuilder.newBuilder()
+					.errCode("002")
+					.description("SHORTENED URL NOT FOUND")
+					.build();
 		}
 	}
 }

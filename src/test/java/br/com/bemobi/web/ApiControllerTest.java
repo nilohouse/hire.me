@@ -87,7 +87,10 @@ public class ApiControllerTest {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON))
 		.andDo(print())
-		.andExpect(status().isNoContent());
+		.andExpect(status().isOk())
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.errCode", is("002")))
+        .andExpect(jsonPath("$.description", is("SHORTENED URL NOT FOUND")));
 	}
 	
 	@Test

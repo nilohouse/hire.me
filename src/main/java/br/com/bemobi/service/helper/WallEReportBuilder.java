@@ -54,4 +54,8 @@ public final class WallEReportBuilder {
 		report.setStatistics(stats);
 		return report;
 	}
+
+	public static WallEReport emptyReport() {
+		return new WallEReport();
+	}
 }
