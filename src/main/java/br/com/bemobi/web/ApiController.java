@@ -2,6 +2,7 @@ package br.com.bemobi.web;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.bemobi.domain.AccessLogSummary;
 import br.com.bemobi.domain.ShortenedURL;
 import br.com.bemobi.service.WallE;
 import br.com.bemobi.service.helper.WallEReportBuilder;
@@ -29,8 +31,8 @@ public class ApiController {
 	@RequestMapping(value = "/create", method = RequestMethod.PUT)
 	public WallEReport create(
 			@RequestParam URL url,
-			@RequestParam(name = "CUSTOM_VALUE", required = false) String customValue) {
-		return wallE.handle(url, customValue);
+			@RequestParam(name = "CUSTOM_ALIAS", required = false) String customAlias) {
+		return wallE.handle(url, customAlias);
 	}
 
 	@RequestMapping(value = "/retrieve/{alias}", method = RequestMethod.GET)
@@ -49,5 +51,10 @@ public class ApiController {
 					.description("SHORTENED URL NOT FOUND")
 					.build();
 		}
+	}
+	
+	@RequestMapping(value = "/top10", method = RequestMethod.GET)
+	public List<AccessLogSummary> top10() {
+		return wallE.getCompleteAccessLogSummary();
 	}
 }

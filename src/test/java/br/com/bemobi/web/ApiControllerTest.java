@@ -108,4 +108,15 @@ public class ApiControllerTest {
 		.andDo(print())
 		.andExpect(status().is3xxRedirection());
 	}
+	
+	@Test
+	public void topTenEndpointTest() throws Exception {
+		
+		this.mvc.perform(get("/top10/")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON))
+		.andDo(print())
+		.andExpect(status().isOk());
+		
+	}	
 }

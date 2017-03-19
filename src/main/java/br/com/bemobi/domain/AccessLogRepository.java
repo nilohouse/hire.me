@@ -10,6 +10,6 @@ public interface AccessLogRepository extends Repository<AccessLog, Long> {
 
 	void save(AccessLog accessLog);
 	
-	@Query(value="select count(al.id) as hits, al.url as url from AccessLog as al group by al.shortenedUrlId")
+	@Query(value="select count(al.id) as hits, al.url as url from AccessLog as al group by url order by hits")
 	List<Map<String, Object>> getCompleteAccessLogSummary();
 }

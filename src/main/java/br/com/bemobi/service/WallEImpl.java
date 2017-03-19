@@ -1,8 +1,10 @@
 package br.com.bemobi.service;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import br.com.bemobi.domain.AccessLog;
+import br.com.bemobi.domain.AccessLogRepository;
+import br.com.bemobi.domain.AccessLogSummary;
 import br.com.bemobi.domain.ShortenedURL;
 import br.com.bemobi.domain.ShortenedURLRepository;
-import br.com.bemobi.domain.AccessLogRepository;
 import br.com.bemobi.domain.helper.ShortenedURLBuilder;
 import br.com.bemobi.service.helper.WallEReportBuilder;
 import br.com.bemobi.web.WallEReport;
@@ -25,7 +28,7 @@ import com.google.common.hash.HashFunction;
 public class WallEImpl implements WallE {
 
 	private ShortenedURLRepository repository;
-	
+
 	private AccessLogRepository accessLogRepository;
 
 	private HashFunction hash;
@@ -84,11 +87,11 @@ public class WallEImpl implements WallE {
 	@Override
 	public ShortenedURL findUrl(String alias) {
 		final ShortenedURL shortenedURL = repository.findByAlias(alias);
-		
+
 		if (ShortenedURL.isValid(shortenedURL)) {
 			checkIn(shortenedURL);
 		}
-		
+
 		return shortenedURL;
 	}
 
@@ -97,5 +100,17 @@ public class WallEImpl implements WallE {
 		accessLog.setUrl(shortenedURL.getUrl());
 		accessLog.setShortenedUrlId(shortenedURL.getId());
 		accessLogRepository.save(accessLog);
+	}
+
+	@Override
+	public List<AccessLogSummary> getCompleteAccessLogSummary() {
+		final List<Map<String, Object>> completeAccessLogSummary = accessLogRepository
+				.getCompleteAccessLogSummary();
+
+		return completeAccessLogSummary
+				.stream()
+				.map(p -> new AccessLogSummary(p.get("url").toString(), Long
+						.valueOf(p.get("hits").toString())))
+				.collect(Collectors.toList());
 	}
 }

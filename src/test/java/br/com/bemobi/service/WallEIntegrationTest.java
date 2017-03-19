@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import br.com.bemobi.domain.AccessLogRepository;
+import br.com.bemobi.domain.AccessLogSummary;
 import br.com.bemobi.domain.ShortenedURL;
 import br.com.bemobi.domain.ShortenedURLRepository;
 import br.com.bemobi.web.WallEReport;
@@ -43,7 +44,7 @@ public class WallEIntegrationTest {
 	
 	@Before
 	public void setUp() {
-		this.wallE = new WallEImpl(repository, accessLogRepository ,Hashing.murmur3_32());
+		this.wallE = new WallEImpl(repository, accessLogRepository, Hashing.murmur3_32());
 	}
 	
 	@After
@@ -141,5 +142,35 @@ public class WallEIntegrationTest {
 		final List<Map<String, Object>> accessLogSummary = accessLogRepository.getCompleteAccessLogSummary();
 		assertNotNull(accessLogSummary);
 		assertEquals(1, Long.valueOf(accessLogSummary.get(0).get("hits").toString()).longValue());
+	}
+	
+	@Test
+	public void shouldNotExplodeWhenTryingAnEmptySummaryTest() {
+		final List<AccessLogSummary> completeSummary = wallE.getCompleteAccessLogSummary();
+		assertNotNull(completeSummary);
+	}
+	
+	@Test
+	public void createRetrieveAndCheckAccessLogWithMultipleUrlsTest() throws MalformedURLException {
+		String urlPath = "http://scarface.com";
+		String scarface = "scarface";
+		wallE.handle(new URL(urlPath), scarface);
+		
+		for (int i = 0; i < 10; i++) {
+			wallE.findUrl(scarface);
+		}
+		
+		urlPath = "http://godfellas.com";
+		String godFellas = "godFellas";
+		wallE.handle(new URL(urlPath), godFellas);
+		
+		for (int i = 0; i < 20; i++) {
+			wallE.findUrl(godFellas);
+		}
+		
+		final List<AccessLogSummary> completeSummary = wallE.getCompleteAccessLogSummary();
+		assertNotNull(completeSummary);
+		assertEquals(10, completeSummary.get(0).getHits().longValue());
+		assertEquals(20, completeSummary.get(1).getHits().longValue());
 	}
 }
